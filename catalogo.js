@@ -1,23 +1,18 @@
-/*
- * CATÁLOGO DE MARCADORES
- *
- * Coloque as fotografias na pasta "imagens" com estes nomes:
- * marcador-01.jpg, marcador-02.jpg, marcador-03.jpg ...
- *
- * O site também reconhece .jpeg, .png e .webp.
- * Para adicionar mais modelos, copie uma linha abaixo e altere o número.
- */
+/* Catálogo real dos marcadores enviados. */
 window.MARCADORES = [
-  { titulo: "Marcador 01", imagem: "imagens/marcador-01" },
-  { titulo: "Marcador 02", imagem: "imagens/marcador-02" },
-  { titulo: "Marcador 03", imagem: "imagens/marcador-03" },
-  { titulo: "Marcador 04", imagem: "imagens/marcador-04" },
-  { titulo: "Marcador 05", imagem: "imagens/marcador-05" },
-  { titulo: "Marcador 06", imagem: "imagens/marcador-06" },
-  { titulo: "Marcador 07", imagem: "imagens/marcador-07" },
-  { titulo: "Marcador 08", imagem: "imagens/marcador-08" },
-  { titulo: "Marcador 09", imagem: "imagens/marcador-09" },
-  { titulo: "Marcador 10", imagem: "imagens/marcador-10" },
-  { titulo: "Marcador 11", imagem: "imagens/marcador-11" },
-  { titulo: "Marcador 12", imagem: "imagens/marcador-12" }
+  { titulo: "Laguna", imagem: "imagens/laguna.jpg", verso: "imagens/laguna-verso.jpg" },
+  { titulo: "Lua", imagem: "imagens/lua.jpg" },
+  { titulo: "Luisa", imagem: "imagens/luisa.jpg" },
+  { titulo: "Maria", imagem: "imagens/maria.jpg", verso: "imagens/maria-verso.jpg" },
+  { titulo: "Matemática", imagem: "imagens/matematica.jpg" },
+  { titulo: "Melancia", imagem: "imagens/melancia.jpg" },
+  { titulo: "Menina Luisa", imagem: "imagens/menina-luisa.jpg", verso: "imagens/menina-luisa-verso.jpg" },
+  { titulo: "Menino e o Mundo", imagem: "imagens/menino-e-o-mundo.jpg", verso: "imagens/menino-e-o-mundo-verso.jpg" },
+  { titulo: "Meu Tio", imagem: "imagens/meu-tio.jpg" },
+  { titulo: "Moranguinho", imagem: "imagens/moranguinho.jpg" },
+  { titulo: "My Little Pony", imagem: "imagens/my-little-poney.jpg" },
+  { titulo: "Não Mais que Você", imagem: "imagens/nao-mais-que-voce.jpg" },
+  { titulo: "Nuvens", imagem: "imagens/nuvens.jpg" },
+  { titulo: "O Tiago é Top", imagem: "imagens/o-tiago-e-top.jpg" },
+  { titulo: "Olho", imagem: "imagens/olho.jpg" }
 ];
