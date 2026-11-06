@@ -378,6 +378,7 @@ h1 em, h2 em, h3 em { color: var(--coral); font-family: var(--serif); font-weigh
 }
 .collection-count::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--coral); }
 
+.gallery-empty[hidden] { display: none !important; }
 .gallery-empty {
   min-height: 385px;
   background: var(--paper);
