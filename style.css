@@ -430,13 +430,27 @@ h1 em, h2 em, h3 em { color: var(--coral); font-family: var(--serif); font-weigh
 }
 .gallery-grid:empty { display: none; }
 .product-card {
-  appearance: none; width: 100%; border: 0; padding: 0; text-align: left; cursor: pointer;
-  background: var(--paper); color: var(--ink); overflow: hidden;
+  width: 100%; background: var(--paper); color: var(--ink); overflow: hidden;
 }
-.product-card[hidden] { display: none; }
-.product-image-wrap { aspect-ratio: 4 / 5; overflow: hidden; background: #dedbd1; display: block; }
-.product-image { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.2,.7,.2,1); }
-.product-card:hover .product-image { transform: scale(1.045); }
+.product-image-wrap {
+  min-height: 390px; aspect-ratio: 3 / 4; overflow: hidden; background: #dedbd1;
+  display: flex; align-items: stretch; justify-content: center; position: relative;
+}
+.product-image-wrap.has-verso { gap: 1px; background: #cfcac0; }
+.product-side {
+  position: relative; flex: 1 1 100%; min-width: 0; border: 0; padding: 18px 16px 28px;
+  background: #f8f5ec; cursor: zoom-in; overflow: hidden;
+}
+.product-side img {
+  width: 100%; height: 100%; display: block; object-fit: contain;
+  transition: transform .6s cubic-bezier(.2,.7,.2,1);
+}
+.product-side:hover img { transform: scale(1.035); }
+.product-side span {
+  position: absolute; left: 12px; bottom: 10px; padding: 5px 8px; border-radius: 999px;
+  background: rgba(32,34,31,.82); color: var(--paper); font-size: 7px; font-weight: 700;
+  letter-spacing: 1.2px; text-transform: uppercase;
+}
 .product-meta { padding: 17px 18px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .product-name { font-family: var(--serif); font-size: 19px; }
 .product-number { color: var(--muted); font-size: 8px; font-weight: 700; letter-spacing: 1.5px; }
@@ -601,6 +615,8 @@ h1 em, h2 em, h3 em { color: var(--coral); font-family: var(--serif); font-weigh
   .hero-actions { align-items: flex-start; flex-direction: column; }
   .hero-visual { transform: scale(.69); margin-left: -46px; margin-right: -46px; margin-bottom: -120px; }
   .gallery-grid { grid-template-columns: 1fr; }
+  .product-image-wrap { min-height: 420px; }
+  .product-side { padding: 14px 10px 28px; }
   .manifesto h2 { font-size: 40px; }
 }
 @media (prefers-reduced-motion: reduce) {
