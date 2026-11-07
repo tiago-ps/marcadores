@@ -248,7 +248,7 @@
       data.get("mensagem") || ""
     ].join("\n");
 
-    const mailto = "mailto:temsimuai@ifmg.edu.br"
+    const mailto = "mailto:biblioteca.sabara@ifmg.edu.br"
       + "?subject=" + encodeURIComponent(subject)
       + "&body=" + encodeURIComponent(body);
 
