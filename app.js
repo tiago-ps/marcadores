@@ -67,6 +67,7 @@
       }));
 
     const byName = new Map(images.map(file => [file.name.toLowerCase(), file]));
+    const catalogByImage = new Map((Array.isArray(window.MARCADORES) ? window.MARCADORES : []).map(marker => [String(marker.imagem || "").split("/").pop().toLowerCase(), marker]));
     const markers = [];
     const used = new Set();
 
@@ -111,7 +112,7 @@
         .find(Boolean);
 
       markers.push({
-        titulo: formatTitle(front.name),
+        titulo: (catalogByImage.get(front.name.toLowerCase()) || {}).titulo || formatTitle(front.name),
         imagem: front.download_url,
         verso: verso ? verso.download_url : null
       });
