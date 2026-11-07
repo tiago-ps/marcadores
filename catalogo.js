@@ -59,7 +59,7 @@ window.MARCADORES = [
   { titulo: "Lua", imagem: "imagens/lua.jpg" },
   { titulo: "Luisa", imagem: "imagens/luisa.jpg" },
   { titulo: "Maria (2)", imagem: "imagens/maria (2).jpg" },
-  { titulo: "Maria", imagem: "imagens/maria.jpg", verso: "imagens/maria-verso.jpg" },
+  { titulo: "Maria", imagem: "imagens/maria.jpg" },
   { titulo: "Matemática", imagem: "imagens/matematica.jpg" },
   { titulo: "Melancia", imagem: "imagens/melancia.jpg" },
   { titulo: "Menina Luisa", imagem: "imagens/menina-luisa.jpg", verso: "imagens/menina-luisa-verso.jpg" },
