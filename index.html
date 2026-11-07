@@ -94,30 +94,118 @@
       <section class="interaction-section section-wrap" id="participar">
         <div class="section-kicker"><span>03</span> PARTICIPE</div>
         <div class="interaction-heading">
-          <div><h2>O marcador também<br>pode <em>voltar para você.</em></h2></div>
-          <div class="interaction-intro"><p>Se você criou um dos marcadores da coleção, este espaço é seu também. Você pode pedir a retirada do original, corrigir ou acrescentar a autoria, contar a história da obra ou dizer como gostaria que ela fosse divulgada.</p><p>Também queremos ouvir quem passa por aqui: dúvidas, críticas, elogios e sugestões são bem-vindos.</p></div>
+          <div><h2>Seu marcador pode<br>fazer parte da <em>coleção.</em></h2></div>
+          <div class="interaction-intro">
+            <p>Escolha como quer participar. Se você já criou um marcador, pode ajudar a contar sua história, pedir uma alteração ou trazer uma nova criação para a coleção.</p>
+            <p>Você decide se a imagem pode aparecer no site, se o original pode ficar exposto e se podem ser feitas cópias coloridas.</p>
+          </div>
         </div>
-        <form class="interaction-form" id="interaction-form">
-          <div class="form-grid">
-            <label><span>Seu nome</span><input type="text" name="nome" autocomplete="name" placeholder="Como podemos identificar você?"></label>
-            <label><span>Como podemos responder?</span><input type="text" name="contato" autocomplete="email" placeholder="E-mail ou outra forma de contato"></label>
+
+        <form class="interaction-form" id="interaction-form" enctype="multipart/form-data" novalidate>
+          <div class="participation-choices">
+            <label class="choice-card">
+              <input type="radio" name="caminho" value="marcador-no-site" required>
+              <span class="choice-number">01</span>
+              <strong>Meu marcador já está na coleção</strong>
+              <small>Corrigir autoria, contar sua história, alterar permissões ou pedir retirada.</small>
+            </label>
+            <label class="choice-card">
+              <input type="radio" name="caminho" value="novo-marcador" required>
+              <span class="choice-number">02</span>
+              <strong>Fiz um marcador que não está na coleção</strong>
+              <small>Envie uma foto para que ele possa ser incluído no site.</small>
+            </label>
+            <label class="choice-card">
+              <input type="radio" name="caminho" value="expor-biblioteca" required>
+              <span class="choice-number">03</span>
+              <strong>Quero deixar meu marcador na biblioteca</strong>
+              <small>Combine a entrega pessoal do original para exposição no balcão.</small>
+            </label>
           </div>
-          <label><span>Sobre o que você quer falar?</span><select name="assunto" id="interaction-topic" required><option value="">Escolha uma opção</option><option value="Retirada de marcador">Quero solicitar a retirada de um marcador que fiz</option><option value="Adicionar um marcador à coleção">Tenho um marcador que não está na coleção e quero enviá-lo para o site</option><option value="Deixar um marcador na biblioteca">Quero deixar meu marcador exposto na biblioteca</option><option value="Autoria e identificação">Quero informar ou corrigir a autoria / nome do marcador</option><option value="Relato sobre a obra">Quero contar a história ou fazer um relato sobre um marcador</option><option value="Divulgação e reprodução">Quero definir como meu marcador pode ser divulgado ou reproduzido</option><option value="Sugestão, crítica ou dúvida">Tenho uma sugestão, crítica ou dúvida</option><option value="Doação de materiais">Quero oferecer materiais para a criação dos marcadores</option></select></label>
-          <div class="form-grid" id="marker-fields">
-            <label><span>Nome do marcador</span><input type="text" name="marcador" placeholder="Se souber o nome ou como ele aparece na coleção"></label>
-            <label><span>Nome da autoria</span><input type="text" name="autoria" placeholder="Seu nome, nome artístico ou como deseja aparecer"></label>
+
+          <div class="form-section">
+            <h3>Sobre você</h3>
+            <div class="form-grid">
+              <label><span>Seu nome</span><input type="text" name="fi-sender-fullName" autocomplete="name" placeholder="Como podemos identificar você?" required></label>
+              <label><span>E-mail para contato</span><input type="email" name="fi-sender-email" autocomplete="email" placeholder="Seu e-mail (se tiver)" ></label>
+            </div>
           </div>
-          <label><span>Se deseja retirar um marcador, o que você gostaria?</span><select name="retirada"><option value="Não se aplica">Não se aplica</option><option value="Retirar o original da exposição">Retirar o original da exposição / balcão</option><option value="Retirar a imagem do site">Retirar a imagem e a identificação do site</option><option value="Retirar o original e a imagem do site">Retirar o original e também a imagem do site</option></select></label>
-          <fieldset class="permission-box"><legend>Se o marcador for seu, você pode definir estas permissões</legend><label class="check-row"><input type="checkbox" name="permitir_divulgacao"><span>Permito que o marcador seja divulgado neste site.</span></label><label class="check-row"><input type="checkbox" name="permitir_copias"><span>Permito que sejam impressas cópias coloridas para distribuição na biblioteca.</span></label><p class="permission-note">A divulgação e a impressão são decisões diferentes. Você pode permitir a primeira e não permitir a segunda.</p></fieldset>
-          <label><span>Conte para nós</span><textarea name="mensagem" rows="6" placeholder="Pode ser um relato sobre como o marcador surgiu, o que ele significa, uma sugestão, crítica, dúvida ou qualquer outra coisa que queira compartilhar. Se estiver enviando um marcador que não está na coleção, diga também como podemos identificá-lo." required></textarea></label>
-          <div class="form-actions"><button class="button button-dark" type="submit">Enviar para a biblioteca <span aria-hidden="true">↗</span></button><span>O envio abrirá seu aplicativo de e-mail. Para enviar uma foto, anexe-a à mensagem antes de enviá-la. Se quiser deixar o original exposto, a entrega precisa ser feita pessoalmente na biblioteca.</span></div>
-          <p class="form-feedback" id="form-feedback" aria-live="polite"></p>
+
+          <div class="conditional-panel" id="existing-panel" hidden>
+            <div class="form-section">
+              <h3>Sobre o marcador que já está no site</h3>
+              <label><span>Nome ou descrição do marcador</span><input type="text" name="fi-text-marcador_existente" placeholder="Como podemos encontrá-lo na coleção?"></label>
+              <label><span>O que você gostaria de solicitar?</span>
+                <select name="fi-select-solicitacao_existente">
+                  <option value="">Escolha uma opção</option>
+                  <option>Corrigir ou acrescentar autoria</option>
+                  <option>Contar a história do marcador</option>
+                  <option>Alterar permissão de divulgação</option>
+                  <option>Não permitir novas cópias coloridas</option>
+                  <option>Retirar o original da exposição</option>
+                  <option>Retirar a imagem e a identificação do site</option>
+                  <option>Retirar o original e a imagem do site</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div class="conditional-panel" id="new-panel" hidden>
+            <div class="form-section">
+              <h3>Envie seu marcador</h3>
+              <p class="form-help">Escolha uma ou mais fotos nítidas. Se possível, fotografe a frente e o verso, com boa iluminação.</p>
+              <label class="upload-field">
+                <span>Fotos do marcador</span>
+                <input type="file" name="fi-file-fotos[]" id="marker-photos" accept="image/jpeg,image/png,image/webp" multiple>
+                <small>JPG, PNG ou WebP · até 25 MB no total por envio</small>
+              </label>
+              <label><span>Como gostaria que o marcador fosse identificado?</span><input type="text" name="fi-text-identificacao_novo" placeholder="Título, nome ou breve descrição"></label>
+            </div>
+          </div>
+
+          <div class="conditional-panel" id="exhibit-panel" hidden>
+            <div class="exhibit-note">
+              <strong>O original precisa ser entregue pessoalmente.</strong>
+              <p>O formulário serve para nos avisar e contar um pouco sobre o marcador. Para deixá-lo exposto, traga o marcador físico à Biblioteca do IFMG Campus Sabará. A equipe poderá conversar com você sobre a exposição.</p>
+            </div>
+            <div class="form-section">
+              <h3>Sobre o marcador que deseja entregar</h3>
+              <label><span>Nome ou descrição</span><input type="text" name="fi-text-identificacao_exposicao" placeholder="Conte como é o marcador"></label>
+              <label><span>Você pretende entregá-lo pessoalmente?</span>
+                <select name="fi-select-entrega_pessoal">
+                  <option value="">Selecione</option>
+                  <option>Sim, vou levar à biblioteca</option>
+                  <option>Quero conversar antes com a equipe</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-section permissions-section" id="permissions-panel">
+            <h3>Como podemos compartilhar?</h3>
+            <p class="form-help">Estas permissões são independentes. Marque somente o que você autoriza.</p>
+            <label class="check-row"><input type="checkbox" name="fi-checkbox-permissoes" value="Autorizo a publicação da imagem no site"><span>Autorizo a publicação da imagem no site.</span></label>
+            <label class="check-row"><input type="checkbox" name="fi-checkbox-permissoes" value="Autorizo a exposição do original na biblioteca"><span>Autorizo a exposição do marcador original na biblioteca, após entregá-lo pessoalmente.</span></label>
+            <label class="check-row"><input type="checkbox" name="fi-checkbox-permissoes" value="Autorizo a impressão de cópias coloridas para distribuição na biblioteca"><span>Autorizo a impressão de cópias coloridas para distribuição na biblioteca.</span></label>
+          </div>
+
+          <div class="form-section">
+            <label><span>Mensagem para a biblioteca</span><textarea name="fi-text-mensagem" rows="5" placeholder="Conte o que precisamos saber. Você pode falar sobre a criação, o significado do marcador ou qualquer detalhe do seu pedido." required></textarea></label>
+            <input type="text" name="_gotcha" class="form-honeypot" tabindex="-1" autocomplete="off" aria-hidden="true">
+          </div>
+          <div class="form-actions">
+            <button class="button button-dark" id="form-submit" type="submit">Enviar para a biblioteca <span aria-hidden="true">↗</span></button>
+            <span>O envio é feito diretamente pelo site. Você não precisa abrir um aplicativo de e-mail.</span>
+          </div>
+          <p class="form-feedback" id="form-feedback" role="status" aria-live="polite"></p>
         </form>
+
         <div class="materials-contact">
           <div><div class="section-kicker"><span>04</span> AJUDE A CRIAR</div><h3>Também aceitamos<br><em>materiais.</em></h3><p>Papel mais grosso, tinta, pincel, lápis, giz e outros materiais que possam ganhar uma nova vida nas mãos de quem cria.</p></div>
           <div class="contact-card"><span class="contact-label">FALE COM A BIBLIOTECA</span><strong>Biblioteca do IFMG Campus Sabará</strong><a href="mailto:biblioteca.sabara@ifmg.edu.br">biblioteca.sabara@ifmg.edu.br</a><a href="tel:+553121029374">(31) 2102-9374</a><span>segunda a sexta · 9h às 21h</span></div>
         </div>
       </section>
+
       <section class="closing section-wrap"><div class="closing-copy"><div class="section-kicker"><span>05</span> PARA ALÉM DO MARCADOR</div><h2>Um pequeno espaço<br>para criar, deixar<br>e <em>ser escutado.</em></h2></div><a class="closing-stamp" href="#inicio" aria-label="Voltar ao início"><span>VOLTAR AO<br>COMEÇO</span><b>↑</b></a></section>
     </main>
     <footer class="site-footer"><a class="footer-brand" href="#inicio">entrelinhas<span>®</span></a><span>UM LUGAR PARA CRIAR E DEIXAR MARCAS.</span><a href="https://github.com/tiago-ps/marcadores" target="_blank" rel="noopener">PROJETO NO GITHUB ↗</a><span>© <span id="current-year">2026</span></span></footer>
