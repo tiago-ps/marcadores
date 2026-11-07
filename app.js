@@ -224,6 +224,38 @@
 
   loadCollection();
 
+  const interactionForm = document.getElementById("interaction-form");
+  const formFeedback = document.getElementById("form-feedback");
+
+  interactionForm.addEventListener("submit", event => {
+    event.preventDefault();
+
+    const data = new FormData(interactionForm);
+    const subject = "[Entrelinhas] " + (data.get("assunto") || "Contato sobre os marcadores");
+    const body = [
+      "ENTRELINHAS — MARCADORES DE PÁGINA",
+      "",
+      "Nome: " + (data.get("nome") || "não informado"),
+      "Contato para resposta: " + (data.get("contato") || "não informado"),
+      "Assunto: " + (data.get("assunto") || "não informado"),
+      "Nome do marcador: " + (data.get("marcador") || "não informado"),
+      "Autoria: " + (data.get("autoria") || "não informado"),
+      "Solicitação de retirada: " + (data.get("retirada") || "não se aplica"),
+      "Permite divulgação no site: " + (data.get("permitir_divulgacao") ? "SIM" : "NÃO"),
+      "Permite impressão de cópias para distribuição: " + (data.get("permitir_copias") ? "SIM" : "NÃO"),
+      "",
+      "Mensagem:",
+      data.get("mensagem") || ""
+    ].join("\n");
+
+    const mailto = "mailto:temsimuai@ifmg.edu.br"
+      + "?subject=" + encodeURIComponent(subject)
+      + "&body=" + encodeURIComponent(body);
+
+    formFeedback.textContent = "Abrindo seu aplicativo de e-mail com a mensagem preenchida…";
+    window.location.href = mailto;
+  });
+
   const menuToggle = document.getElementById("menu-toggle");
   const nav = document.getElementById("main-nav");
 
