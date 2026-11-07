@@ -74,10 +74,10 @@
       if (used.has(file.name)) return;
 
       // Arquivos com "-verso" pertencem à imagem correspondente.
-      if (/-verso\\.(jpe?g|png|webp)$/i.test(file.name)) return;
+      if (/-verso\.(jpe?g|png|webp)$/i.test(file.name)) return;
 
       let front = file;
-      let baseName = file.name.replace(/\\.(jpe?g|png|webp)$/i, "");
+      let baseName = file.name.replace(/\.(jpe?g|png|webp)$/i, "");
 
       // Aceita tanto "nome.jpg" quanto "nome-frente.jpg".
       if (/-frente$/i.test(baseName)) {
