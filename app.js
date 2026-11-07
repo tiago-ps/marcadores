@@ -1,5 +1,5 @@
 (() => {
-  "use strict";\n\n  // Forminit SDK: endpoint público para formulários do GitHub Pages.
+  "use strict";
 
   const gallery = document.getElementById("gallery-grid");
   const emptyState = document.getElementById("gallery-empty");
@@ -224,80 +224,44 @@
 
   loadCollection();
 
-  const interactionForm = document.getElementById("interaction-form");
-  const formFeedback = document.getElementById("form-feedback");
-  const submitButton = document.getElementById("form-submit");
-  const forminit = new Forminit();
-  const FORMINIT_FORM_ID = "COLE_AQUI_O_ID_DO_FORMINIT";
+  const choiceInputs = document.querySelectorAll('input[name="caminho"]');
+  const guidance = document.getElementById("contact-guidance");
+  const guidanceTitle = document.getElementById("contact-guidance-title");
+  const guidanceText = document.getElementById("contact-guidance-text");
+  const emailLink = document.getElementById("email-contact-link");
+  const libraryEmail = "biblioteca.sabara@ifmg.edu.br";
 
-  const choicePanels = {
-    "marcador-no-site": document.getElementById("existing-panel"),
-    "novo-marcador": document.getElementById("new-panel"),
-    "expor-biblioteca": document.getElementById("exhibit-panel")
+  const emailTemplates = {
+    "marcador-no-site": {
+      title: "Solicitar uma alteração na coleção",
+      text: "Informe seu nome e como podemos localizar o marcador. Você pode solicitar correção de autoria, alteração de autorização ou retirada da imagem, da identificação ou do original em exposição.",
+      subject: "Entrelinhas — solicitação sobre marcador já publicado",
+      body: "Olá, Biblioteca!\n\nGostaria de solicitar uma alteração sobre um marcador que já está na coleção do Entrelinhas.\n\nMeu nome: \nComo localizar o marcador na coleção: \nSolicitação (correção de autoria, alteração de autorização ou retirada): \n\nObrigado(a)!"
+    },
+    "novo-marcador": {
+      title: "Apresentar um novo marcador",
+      text: "Anexe uma fotografia do marcador à mensagem. Informe seu nome para contato e indique se deseja que a imagem seja publicada sem identificação ou com o crédito de autoria. A publicação depende de autorização.",
+      subject: "Entrelinhas — novo marcador para a coleção",
+      body: "Olá, Biblioteca!\n\nGostaria de apresentar um marcador para possível inclusão na coleção do Entrelinhas. Vou anexar a fotografia a esta mensagem.\n\nMeu nome para contato: \nNome de autoria, caso queira crédito público (opcional): \nAutorização para publicação da imagem: ( ) Sim, sem identificação   ( ) Sim, com identificação de autoria   ( ) Não autorizo a publicação\n\nObrigado(a)!"
+    },
+    "expor-biblioteca": {
+      title: "Conversar sobre a exposição do original",
+      text: "O marcador original precisa ser entregue pessoalmente na Biblioteca do IFMG Campus Sabará. Use o e-mail para avisar a equipe e combinar a entrega.",
+      subject: "Entrelinhas — entrega de marcador original",
+      body: "Olá, Biblioteca!\n\nGostaria de conversar sobre a possibilidade de deixar meu marcador original exposto na biblioteca. Sei que a entrega do original precisa ser feita pessoalmente.\n\nMeu nome: \nMelhor forma de combinar a entrega: \n\nObrigado(a)!"
+    }
   };
 
-  function updateParticipationChoice() {
-    const selected = interactionForm.querySelector('input[name="caminho"]:checked');
-    const value = selected ? selected.value : "";
-    Object.entries(choicePanels).forEach(([key, panel]) => {
-      panel.hidden = key !== value;
+  choiceInputs.forEach(input => {
+    input.addEventListener("change", () => {
+      const template = emailTemplates[input.value];
+      if (!template) return;
+      guidanceTitle.textContent = template.title;
+      guidanceText.textContent = template.text;
+      const params = new URLSearchParams({ subject: template.subject, body: template.body });
+      emailLink.href = "mailto:" + libraryEmail + "?" + params.toString();
+      guidance.hidden = false;
     });
-    const photoInput = document.getElementById("marker-photos");
-    if (photoInput) photoInput.required = value === "novo-marcador";
-  }
-
-  interactionForm.querySelectorAll('input[name="caminho"]').forEach(input => {
-    input.addEventListener("change", updateParticipationChoice);
-  });
-
-  interactionForm.addEventListener("submit", async event => {
-    event.preventDefault();
-    formFeedback.textContent = "";
-
-    if (FORMINIT_FORM_ID === "COLE_AQUI_O_ID_DO_FORMINIT") {
-      formFeedback.textContent = "O formulário está preparado, mas falta conectar o ID do Forminit. A biblioteca precisa concluir essa configuração antes de receber envios.";
-      return;
-    }
-
-    const selected = interactionForm.querySelector('input[name="caminho"]:checked');
-    if (!selected) {
-      formFeedback.textContent = "Escolha uma das três opções para continuar.";
-      return;
-    }
-
-    const photoInput = document.getElementById("marker-photos");
-    if (selected.value === "novo-marcador" && (!photoInput.files || photoInput.files.length === 0)) {
-      formFeedback.textContent = "Selecione pelo menos uma foto do marcador.";
-      photoInput.focus();
-      return;
-    }
-
-    const files = photoInput ? Array.from(photoInput.files) : [];
-    const totalSize = files.reduce((sum, file) => sum + file.size, 0);
-    if (totalSize > 25 * 1024 * 1024) {
-      formFeedback.textContent = "As fotos ultrapassam o limite total de 25 MB. Reduza o tamanho ou envie menos imagens.";
-      return;
-    }
-
-    submitButton.disabled = true;
-    submitButton.textContent = "Enviando…";
-    formFeedback.textContent = "Estamos enviando sua mensagem. Aguarde um instante.";
-
-    try {
-      const formData = new FormData(interactionForm);
-      formData.append("fi-text-tipo_participacao", selected.value);
-      const { data, error } = await forminit.submit(FORMINIT_FORM_ID, formData);
-      if (error) throw new Error(error.message || "Não foi possível enviar o formulário.");
-
-      interactionForm.reset();
-      updateParticipationChoice();
-      formFeedback.textContent = "Mensagem enviada! Obrigado por participar do Entrelinhas. A biblioteca recebeu seu envio.";
-    } catch (error) {
-      formFeedback.textContent = "Não foi possível enviar agora. Verifique sua conexão e tente novamente. " + error.message;
-    } finally {
-      submitButton.disabled = false;
-      submitButton.innerHTML = 'Enviar para a biblioteca <span aria-hidden="true">↗</span>';
-    }
   });
 
   const menuToggle = document.getElementById("menu-toggle");
