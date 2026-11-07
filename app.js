@@ -61,7 +61,10 @@
   function renderMarkers(files) {
     const images = files
       .filter(file => file.type === "file" && IMAGE_EXTENSIONS.test(file.name))
-      .sort((a, b) => a.name.localeCompare(b.name, "pt-BR", { numeric: true, sensitivity: "base" }));
+      .sort((a, b) => a.name.localeCompare(b.name, "pt-BR", {
+        numeric: true,
+        sensitivity: "base"
+      }));
 
     const byName = new Map(images.map(file => [file.name.toLowerCase(), file]));
     const markers = [];
@@ -70,33 +73,57 @@
     images.forEach(file => {
       if (used.has(file.name)) return;
 
-      const isVerso = /-verso\.(jpe?g|png|webp)$/i.test(file.name);
-      if (isVerso) return;
+      // Arquivos com "-verso" pertencem à imagem correspondente.
+      if (/-verso\\.(jpe?g|png|webp)$/i.test(file.name)) return;
 
-      const baseName = file.name.replace(/\.(jpe?g|png|webp)$/i, "");
+      let front = file;
+      let baseName = file.name.replace(/\\.(jpe?g|png|webp)$/i, "");
+
+      // Aceita tanto "nome.jpg" quanto "nome-frente.jpg".
+      if (/-frente$/i.test(baseName)) {
+        const cleanBase = baseName.replace(/-frente$/i, "");
+        const plainCandidates = [
+          cleanBase + ".jpg",
+          cleanBase + ".jpeg",
+          cleanBase + ".png",
+          cleanBase + ".webp"
+        ];
+        const plain = plainCandidates
+          .map(name => byName.get(name.toLowerCase()))
+          .find(Boolean);
+
+        if (plain) {
+          front = plain;
+          baseName = cleanBase;
+          used.add(file.name);
+        }
+      }
+
       const versoCandidates = [
         baseName + "-verso.jpg",
         baseName + "-verso.jpeg",
         baseName + "-verso.png",
         baseName + "-verso.webp"
       ];
+
       const verso = versoCandidates
         .map(name => byName.get(name.toLowerCase()))
         .find(Boolean);
 
       markers.push({
-        titulo: formatTitle(file.name),
-        imagem: file.download_url,
+        titulo: formatTitle(front.name),
+        imagem: front.download_url,
         verso: verso ? verso.download_url : null
       });
 
-      used.add(file.name);
+      used.add(front.name);
       if (verso) used.add(verso.name);
     });
 
-    // Versos sem frente viram marcadores independentes, sem desaparecer.
+    // Um arquivo "-verso" sem frente continua visível, para nenhum trabalho desaparecer.
     images.forEach(file => {
       if (used.has(file.name)) return;
+
       markers.push({
         titulo: formatTitle(file.name),
         imagem: file.download_url,
@@ -155,13 +182,39 @@
       const fallback = Array.isArray(window.MARCADORES) ? window.MARCADORES : [];
 
       if (fallback.length) {
-        const files = fallback.map(marker => ({
-          name: marker.imagem.split("/").pop(),
-          type: "file",
-          download_url: marker.imagem,
-          verso: marker.verso
-        }));
-        renderMarkers(files);
+        gallery.innerHTML = "";
+        loadedCount = 0;
+
+        fallback.forEach((marker, index) => {
+          const card = document.createElement("article");
+          card.className = "product-card";
+
+          const imageWrap = document.createElement("div");
+          imageWrap.className = marker.verso
+            ? "product-image-wrap has-verso"
+            : "product-image-wrap";
+
+          addImage(imageWrap, marker.imagem, marker.titulo, "frente");
+          if (marker.verso) addImage(imageWrap, marker.verso, marker.titulo, "verso");
+
+          const meta = document.createElement("div");
+          meta.className = "product-meta";
+
+          const name = document.createElement("span");
+          name.className = "product-name";
+          name.textContent = marker.titulo;
+
+          const number = document.createElement("span");
+          number.className = "product-number";
+          number.textContent = "Nº " + String(index + 1).padStart(2, "0");
+
+          meta.append(name, number);
+          card.append(imageWrap, meta);
+          gallery.appendChild(card);
+          loadedCount += 1;
+        });
+
+        updateState();
       } else {
         emptyState.hidden = false;
         itemCount.textContent = "NÃO FOI POSSÍVEL CARREGAR A COLEÇÃO";
