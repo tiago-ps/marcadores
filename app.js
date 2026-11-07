@@ -1,5 +1,5 @@
 (() => {
-  "use strict";
+  "use strict";\n\n  // Forminit SDK: endpoint público para formulários do GitHub Pages.
 
   const gallery = document.getElementById("gallery-grid");
   const emptyState = document.getElementById("gallery-empty");
@@ -226,34 +226,78 @@
 
   const interactionForm = document.getElementById("interaction-form");
   const formFeedback = document.getElementById("form-feedback");
+  const submitButton = document.getElementById("form-submit");
+  const forminit = new Forminit();
+  const FORMINIT_FORM_ID = "COLE_AQUI_O_ID_DO_FORMINIT";
 
-  interactionForm.addEventListener("submit", event => {
+  const choicePanels = {
+    "marcador-no-site": document.getElementById("existing-panel"),
+    "novo-marcador": document.getElementById("new-panel"),
+    "expor-biblioteca": document.getElementById("exhibit-panel")
+  };
+
+  function updateParticipationChoice() {
+    const selected = interactionForm.querySelector('input[name="caminho"]:checked');
+    const value = selected ? selected.value : "";
+    Object.entries(choicePanels).forEach(([key, panel]) => {
+      panel.hidden = key !== value;
+    });
+    const photoInput = document.getElementById("marker-photos");
+    if (photoInput) photoInput.required = value === "novo-marcador";
+  }
+
+  interactionForm.querySelectorAll('input[name="caminho"]').forEach(input => {
+    input.addEventListener("change", updateParticipationChoice);
+  });
+
+  interactionForm.addEventListener("submit", async event => {
     event.preventDefault();
+    formFeedback.textContent = "";
 
-    const data = new FormData(interactionForm);
-    const subject = "[Entrelinhas] " + (data.get("assunto") || "Contato sobre os marcadores");
-    const body = [
-      "ENTRELINHAS — MARCADORES DE PÁGINA",
-      "",
-      "Nome: " + (data.get("nome") || "não informado"),
-      "Contato para resposta: " + (data.get("contato") || "não informado"),
-      "Assunto: " + (data.get("assunto") || "não informado"),
-      "Nome do marcador: " + (data.get("marcador") || "não informado"),
-      "Autoria: " + (data.get("autoria") || "não informado"),
-      "Solicitação de retirada: " + (data.get("retirada") || "não se aplica"),
-      "Permite divulgação no site: " + (data.get("permitir_divulgacao") ? "SIM" : "NÃO"),
-      "Permite impressão de cópias para distribuição: " + (data.get("permitir_copias") ? "SIM" : "NÃO"),
-      "",
-      "Mensagem:",
-      data.get("mensagem") || ""
-    ].join("\n");
+    if (FORMINIT_FORM_ID === "COLE_AQUI_O_ID_DO_FORMINIT") {
+      formFeedback.textContent = "O formulário está preparado, mas falta conectar o ID do Forminit. A biblioteca precisa concluir essa configuração antes de receber envios.";
+      return;
+    }
 
-    const mailto = "mailto:biblioteca.sabara@ifmg.edu.br"
-      + "?subject=" + encodeURIComponent(subject)
-      + "&body=" + encodeURIComponent(body);
+    const selected = interactionForm.querySelector('input[name="caminho"]:checked');
+    if (!selected) {
+      formFeedback.textContent = "Escolha uma das três opções para continuar.";
+      return;
+    }
 
-    formFeedback.textContent = "Abrindo seu aplicativo de e-mail com a mensagem preenchida…";
-    window.location.href = mailto;
+    const photoInput = document.getElementById("marker-photos");
+    if (selected.value === "novo-marcador" && (!photoInput.files || photoInput.files.length === 0)) {
+      formFeedback.textContent = "Selecione pelo menos uma foto do marcador.";
+      photoInput.focus();
+      return;
+    }
+
+    const files = photoInput ? Array.from(photoInput.files) : [];
+    const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+    if (totalSize > 25 * 1024 * 1024) {
+      formFeedback.textContent = "As fotos ultrapassam o limite total de 25 MB. Reduza o tamanho ou envie menos imagens.";
+      return;
+    }
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Enviando…";
+    formFeedback.textContent = "Estamos enviando sua mensagem. Aguarde um instante.";
+
+    try {
+      const formData = new FormData(interactionForm);
+      formData.append("fi-text-tipo_participacao", selected.value);
+      const { data, error } = await forminit.submit(FORMINIT_FORM_ID, formData);
+      if (error) throw new Error(error.message || "Não foi possível enviar o formulário.");
+
+      interactionForm.reset();
+      updateParticipationChoice();
+      formFeedback.textContent = "Mensagem enviada! Obrigado por participar do Entrelinhas. A biblioteca recebeu seu envio.";
+    } catch (error) {
+      formFeedback.textContent = "Não foi possível enviar agora. Verifique sua conexão e tente novamente. " + error.message;
+    } finally {
+      submitButton.disabled = false;
+      submitButton.innerHTML = 'Enviar para a biblioteca <span aria-hidden="true">↗</span>';
+    }
   });
 
   const menuToggle = document.getElementById("menu-toggle");
