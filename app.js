@@ -56,6 +56,37 @@
 
     button.addEventListener("click", () => openImage(src, title, side));
     parent.appendChild(button);
+    return button;
+  }
+
+  function setupMobileFlip(wrapper, frontButton, backButton) {
+    frontButton.classList.add("is-active");
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "mobile-flip-toggle";
+    toggle.textContent = "↔";
+    toggle.setAttribute("aria-label", "Ver verso do marcador");
+    let showingBack = false;
+    function showSide(back) {
+      showingBack = back;
+      frontButton.classList.toggle("is-active", !back);
+      backButton.classList.toggle("is-active", back);
+      toggle.setAttribute("aria-label", back ? "Ver frente do marcador" : "Ver verso do marcador");
+    }
+    toggle.addEventListener("click", () => showSide(!showingBack));
+    wrapper.appendChild(toggle);
+    let startX = 0, startY = 0;
+    wrapper.addEventListener("touchstart", event => {
+      if (!event.touches || event.touches.length !== 1) return;
+      startX = event.touches[0].clientX;
+      startY = event.touches[0].clientY;
+    }, { passive:true });
+    wrapper.addEventListener("touchend", event => {
+      if (!event.changedTouches || !event.changedTouches.length) return;
+      const deltaX = event.changedTouches[0].clientX - startX;
+      const deltaY = event.changedTouches[0].clientY - startY;
+      if (Math.abs(deltaX) > 38 && Math.abs(deltaX) > Math.abs(deltaY) * 1.25) showSide(deltaX < 0);
+    }, { passive:true });
   }
 
   function renderMarkers(files) {
@@ -144,8 +175,11 @@
         ? "product-image-wrap has-verso"
         : "product-image-wrap";
 
-      addImage(imageWrap, marker.imagem, marker.titulo, "frente");
-      if (marker.verso) addImage(imageWrap, marker.verso, marker.titulo, "verso");
+      const frontButton = addImage(imageWrap, marker.imagem, marker.titulo, "frente");
+      if (marker.verso) {
+        const backButton = addImage(imageWrap, marker.verso, marker.titulo, "verso");
+        setupMobileFlip(imageWrap, frontButton, backButton);
+      }
 
       const meta = document.createElement("div");
       meta.className = "product-meta";
@@ -195,8 +229,11 @@
             ? "product-image-wrap has-verso"
             : "product-image-wrap";
 
-          addImage(imageWrap, marker.imagem, marker.titulo, "frente");
-          if (marker.verso) addImage(imageWrap, marker.verso, marker.titulo, "verso");
+          const frontButton = addImage(imageWrap, marker.imagem, marker.titulo, "frente");
+          if (marker.verso) {
+            const backButton = addImage(imageWrap, marker.verso, marker.titulo, "verso");
+            setupMobileFlip(imageWrap, frontButton, backButton);
+          }
 
           const meta = document.createElement("div");
           meta.className = "product-meta";
