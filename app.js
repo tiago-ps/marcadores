@@ -12,15 +12,54 @@
   const API_URL = "https://api.github.com/repos/tiago-ps/marcadores/contents/imagens?ref=main";
   let loadedCount = 0;
 
-  function formatTitle(filename) {
-    return filename
+  const TITLE_REPLACEMENTS = {
+    "agua": "água",
+    "coracao": "coração",
+    "coracoes": "corações",
+    "criancas": "crianças",
+    "degrade": "degradê",
+    "eletronica": "eletrônica",
+    "matematica": "matemática",
+    "nao": "não",
+    "voce": "você",
+    "triangulos": "triângulos",
+    "ce": "cê",
+    "ta": "tá",
+    "fimdaescala": "fim da escala"
+  };
+
+  const LOWERCASE_WORDS = new Set([
+    "a", "as", "ao", "aos", "à", "às", "de", "do", "dos", "da", "das",
+    "e", "em", "no", "nos", "na", "nas", "o", "os", "para", "por", "que",
+    "um", "uma", "uns", "umas"
+  ]);
+
+  function humanizeTitle(value) {
+    let title = String(value || "")
       .replace(/\.[^.]+$/, "")
       .replace(/-verso$/i, "")
       .replace(/-frente$/i, "")
+      .replace(/([a-záàâãéêíóôõúç])([A-ZÁÀÂÃÉÊÍÓÔÕÚÇ])/g, "$1 $2")
+      .replace(/([A-Za-zÁÀÂÃÉÊÍÓÔÕÚÇáàâãéêíóôõúç])(\d)/g, "$1 $2")
+      .replace(/(\d)([A-Za-zÁÀÂÃÉÊÍÓÔÕÚÇáàâãéêíóôõúç])/g, "$1 $2")
       .replace(/[_-]+/g, " ")
       .replace(/\s+/g, " ")
-      .trim()
-      .replace(/\b\w/g, char => char.toUpperCase());
+      .trim();
+
+    const compact = title.toLowerCase().replace(/\s+/g, "");
+    if (TITLE_REPLACEMENTS[compact]) title = TITLE_REPLACEMENTS[compact];
+
+    title = title.toLowerCase().split(" ").map((word, index) => {
+      const replacement = TITLE_REPLACEMENTS[word] || word;
+      if (index > 0 && LOWERCASE_WORDS.has(replacement)) return replacement;
+      return replacement.charAt(0).toUpperCase() + replacement.slice(1);
+    }).join(" ");
+
+    return title;
+  }
+
+  function formatTitle(filename) {
+    return humanizeTitle(filename);
   }
 
   function updateState() {
