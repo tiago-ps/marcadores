@@ -296,8 +296,9 @@
       if (!template) return;
       guidanceTitle.textContent = template.title;
       guidanceText.textContent = template.text;
-      const params = new URLSearchParams({ subject: template.subject, body: template.body });
-      emailLink.href = "mailto:" + libraryEmail + "?" + params.toString();
+      const subject = encodeURIComponent(template.subject);
+      const body = encodeURIComponent(template.body);
+      emailLink.href = "mailto:" + libraryEmail + "?subject=" + subject + "&body=" + body;
       guidance.hidden = false;
     });
   });
