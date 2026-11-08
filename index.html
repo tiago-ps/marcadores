@@ -4,6 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f4f1e9">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Entrelinhas">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/icon-192.svg">
   <meta name="description" content="Entrelinhas: uma coleção de marcadores de página criados por estudantes e pela comunidade da biblioteca.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Entrelinhas — Marcadores de página">
@@ -16,6 +22,11 @@
   <link rel="stylesheet" href="./style.css">
   <script src="./catalogo.js" defer></script>
   <script src="./app.js" defer></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js"));
+    }
+  </script>
 </head>
 <body>
   <div class="site-shell">
