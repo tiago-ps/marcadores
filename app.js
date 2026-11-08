@@ -182,7 +182,7 @@
         .find(Boolean);
 
       markers.push({
-        titulo: (catalogByImage.get(front.name.toLowerCase()) || {}).titulo || formatTitle(front.name),
+        titulo: humanizeTitle((catalogByImage.get(front.name.toLowerCase()) || {}).titulo || formatTitle(front.name)),
         imagem: front.download_url,
         verso: verso ? verso.download_url : null
       });
