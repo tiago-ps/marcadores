@@ -721,3 +721,12 @@ h1 em, h2 em, h3 em { color: var(--coral); font-family: var(--serif); font-weigh
 @media (max-width:650px) { .contact-guidance { align-items:flex-start; flex-direction:column; padding:20px; } }
 
 @media (min-width:651px) { .mobile-flip-toggle { display:none; } }
+
+
+/* Destaque das imagens dos marcadores */
+.product-side img {
+  filter: drop-shadow(0 10px 12px rgba(32, 34, 31, .18));
+}
+.product-side:hover img {
+  filter: drop-shadow(0 13px 16px rgba(32, 34, 31, .22));
+}
