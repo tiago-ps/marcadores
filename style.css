@@ -725,8 +725,8 @@ h1 em, h2 em, h3 em { color: var(--coral); font-family: var(--serif); font-weigh
 
 /* Destaque das imagens dos marcadores */
 .product-side img {
-  filter: drop-shadow(0 12px 18px rgba(32, 34, 31, .24));
+  filter: drop-shadow(0 12px 18px rgba(32, 34, 31, .36));
 }
 .product-side:hover img {
-  filter: drop-shadow(0 15px 22px rgba(32, 34, 31, .28));
+  filter: drop-shadow(0 15px 22px rgba(32, 34, 31, .42));
 }
