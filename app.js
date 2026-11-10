@@ -394,16 +394,20 @@
       const col = index % config.cols;
       const stepX = config.width + config.gap;
       const stepY = config.height + config.gap;
-      let left = config.margin + col * stepX;
-      let top = config.margin + row * stepY;
+      // O print-grid começa dentro da área de conteúdo da folha,
+      // depois do padding (margem). Portanto, as coordenadas são relativas
+      // à área útil: não somamos a margem novamente.
+      const contentW = config.pageW - 2 * config.margin;
+      const contentH = config.pageH - 2 * config.margin;
+      let left = col * stepX;
+      let top = row * stepY;
 
-      // O verso é calculado a partir da posição física exata da frente,
-      // e não a partir da última coluna/linha disponível. Assim, sobras
-      // de espaço na folha não deslocam o verso e as margens ficam espelhadas.
+      // No verso, espelhamos somente a posição física do slot.
+      // A imagem permanece na orientação original, sem transformações.
       if (side === "verso" && config.duplex === "long") {
-        left = config.pageW - config.margin - config.width - col * stepX;
+        left = contentW - config.width - col * stepX;
       } else if (side === "verso" && config.duplex === "short") {
-        top = config.pageH - config.margin - config.height - row * stepY;
+        top = contentH - config.height - row * stepY;
       }
 
       slot.style.left = left + "mm";
@@ -415,7 +419,6 @@
         img.src = src;
         img.alt = marker.titulo + " — " + side;
         img.draggable = false;
-        if (side === "verso") img.classList.add(config.duplex === "long" ? "duplex-mirror-x" : "duplex-mirror-y");
         slot.appendChild(img);
       }
       const cut = document.createElement("span");
