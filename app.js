@@ -405,9 +405,16 @@
       // No verso, espelhamos somente a posição física do slot.
       // A imagem permanece na orientação original, sem transformações.
       if (side === "verso" && config.duplex === "long") {
+        // Mantém o posicionamento de margem longa já validado nos testes.
         left = contentW - config.width - col * stepX;
       } else if (side === "verso" && config.duplex === "short") {
-        top = contentH - config.height - row * stepY;
+        // Em paisagem, a margem curta exige espelhamento horizontal;
+        // em retrato, o espelhamento é vertical.
+        if (config.orientation === "landscape") {
+          left = contentW - config.width - col * stepX;
+        } else {
+          top = contentH - config.height - row * stepY;
+        }
       }
 
       slot.style.left = left + "mm";
