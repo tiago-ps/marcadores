@@ -1003,6 +1003,12 @@ h1 em, h2 em, h3 em { color: var(--coral); font-family: var(--serif); font-weigh
     width:auto !important;
     margin:0 !important;
     padding:0 !important;
+    height:auto !important;
+  }
+  .print-section > .section-kicker,
+  .print-section > .print-heading,
+  .print-section > .print-panel {
+    display:none !important;
   }
   .print-heading,
   .print-panel,
