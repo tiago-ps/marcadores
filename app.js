@@ -374,6 +374,7 @@
   function createPrintPage(markers, config, side) {
     const page = document.createElement("div");
     page.className = "print-sheet " + side;
+    page.style.page = "print-" + config.orientation;
     page.style.setProperty("--sheet-width", config.pageW + "mm");
     page.style.setProperty("--sheet-height", config.pageH + "mm");
     page.style.setProperty("--marker-width", config.width + "mm");
