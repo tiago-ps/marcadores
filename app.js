@@ -284,7 +284,7 @@
         .map(ext => byName.get((baseName + "-verso" + ext).toLowerCase())).find(Boolean);
       const catalogEntry = catalogByImage.get(front.name.toLowerCase()) || {};
       markers.push({
-        titulo: humanizeTitle(catalogEntry.titulo || formatTitle(front.name)),
+        titulo: catalogEntry.titulo || formatTitle(front.name),
         imagem: front.download_url,
         verso: verso ? verso.download_url : null,
         autoria: catalogEntry.autoria || "",
