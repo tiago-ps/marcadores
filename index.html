@@ -42,6 +42,7 @@
         <a href="#colecao">Coleção</a>
         <a href="#ideia">A história</a>
         <a href="#participar">Participe</a>
+        <a href="#impressao">Imprimir</a>
         <a class="nav-cta" href="#colecao">Ver os marcadores <span aria-hidden="true">↗</span></a>
       </nav>
     </header>
@@ -97,13 +98,49 @@
           <noscript><p class="noscript-message">Ative o JavaScript do navegador para visualizar a coleção.</p></noscript>
         </div>
       </section>
+      <section class="print-section section-wrap" id="impressao">
+        <div class="section-kicker"><span>03</span> IMPRESSÃO</div>
+        <div class="print-heading">
+          <div>
+            <h2>Monte sua folha<br>de <em>marcadores.</em></h2>
+          </div>
+          <div class="print-intro">
+            <p>Selecione os marcadores que deseja imprimir e o site monta automaticamente uma folha A4, aproveitando o espaço disponível.</p>
+            <p>Quando houver frente e verso, os dois lados ocupam exatamente a mesma posição. O verso é preparado para impressão frente e verso pela <strong>margem longa</strong>.</p>
+          </div>
+        </div>
+
+        <div class="print-panel">
+          <div class="print-controls">
+            <label><span>Orientação</span><select id="print-orientation"><option value="auto">Automática — aproveitar melhor o A4</option><option value="portrait">Retrato</option><option value="landscape">Paisagem</option></select></label>
+            <label><span>Largura do marcador</span><div class="unit-input"><input id="print-width" type="number" min="20" max="90" step="1" value="50"><b>mm</b></div></label>
+            <label><span>Altura do marcador</span><div class="unit-input"><input id="print-height" type="number" min="60" max="250" step="1" value="150"><b>mm</b></div></label>
+            <label><span>Espaço entre marcadores</span><div class="unit-input"><input id="print-gap" type="number" min="0" max="20" step="1" value="5"><b>mm</b></div></label>
+            <label><span>Margem da folha</span><div class="unit-input"><input id="print-margin" type="number" min="5" max="25" step="1" value="10"><b>mm</b></div></label>
+            <label><span>Frente e verso</span><select id="print-duplex"><option value="long">Virar na margem longa — recomendado</option><option value="short">Virar na margem curta</option></select></label>
+          </div>
+          <div class="print-status">
+            <div><strong id="print-selection-count">Nenhum marcador selecionado</strong><span id="print-capacity">Selecione os marcadores na coleção.</span></div>
+            <div class="print-actions"><button class="text-button" id="print-clear" type="button">Limpar seleção</button><button class="button button-dark" id="print-button" type="button" disabled>Preparar impressão <span aria-hidden="true">↗</span></button></div>
+          </div>
+          <div class="print-help">
+            <strong>Para frente e verso</strong>
+            <span>Use escala de <b>100% / tamanho real</b> na janela de impressão e desative “ajustar à página”. Para impressoras duplex, escolha a mesma margem indicada aqui. Em impressoras que exigem virar a folha manualmente, siga a orientação mostrada pelo driver.</span>
+          </div>
+        </div>
+
+        <div class="print-preview" id="print-preview" hidden>
+          <div class="print-preview-head"><span>PRÉ-VISUALIZAÇÃO</span><span id="print-preview-note"></span></div>
+          <div id="print-sheets"></div>
+        </div>
+      </section>
       <section class="manifesto section-wrap">
         <div class="manifesto-topline"><span>DESENHO • PALAVRA • MEMÓRIA</span><span>UM LUGAR DE PAUSA E EXPRESSÃO</span></div>
         <div class="manifesto-main"><div class="manifesto-symbol" aria-hidden="true">“</div><h2>Às vezes, não é só<br>um marcador.<br>É uma forma de <em>dizer algo.</em></h2></div>
         <div class="manifesto-bottom"><span>ENTRELINHAS — MARCADORES DE PÁGINA</span><span>OLHE COM CALMA <b>↗</b></span></div>
       </section>
       <section class="interaction-section section-wrap" id="participar">
-        <div class="section-kicker"><span>03</span> PARTICIPE</div>
+        <div class="section-kicker"><span>04</span> PARTICIPE</div>
         <div class="interaction-heading">
           <div><h2>Seu marcador pode<br>fazer parte da <em>coleção.</em></h2></div>
           <div class="interaction-intro">
@@ -145,12 +182,12 @@
         </div> </form>
 
         <div class="materials-contact">
-          <div><div class="section-kicker"><span>04</span> AJUDE A CRIAR</div><h3>Também aceitamos<br><em>materiais.</em></h3><p>Papel mais grosso, tinta, pincel, lápis, giz e outros materiais que possam ganhar uma nova vida nas mãos de quem cria.</p></div>
+          <div><div class="section-kicker"><span>05</span> AJUDE A CRIAR</div><h3>Também aceitamos<br><em>materiais.</em></h3><p>Papel mais grosso, tinta, pincel, lápis, giz e outros materiais que possam ganhar uma nova vida nas mãos de quem cria.</p></div>
           <div class="contact-card"><span class="contact-label">FALE COM A BIBLIOTECA</span><strong>Biblioteca do IFMG Campus Sabará</strong><a href="mailto:biblioteca.sabara@ifmg.edu.br">biblioteca.sabara@ifmg.edu.br</a><a href="tel:+553121029374">(31) 2102-9374</a><span>segunda a sexta · 9h às 21h</span></div>
         </div>
       </section>
 
-      <section class="closing section-wrap"><div class="closing-copy"><div class="section-kicker"><span>05</span> PARA ALÉM DO MARCADOR</div><h2>Um pequeno espaço<br>para criar, deixar<br>e <em>marcar presença.</em></h2></div><a class="closing-stamp" href="#inicio" aria-label="Voltar ao início"><span>VOLTAR AO<br>COMEÇO</span><b>↑</b></a></section>
+      <section class="closing section-wrap"><div class="closing-copy"><div class="section-kicker"><span>06</span> PARA ALÉM DO MARCADOR</div><h2>Um pequeno espaço<br>para criar, deixar<br>e <em>marcar presença.</em></h2></div><a class="closing-stamp" href="#inicio" aria-label="Voltar ao início"><span>VOLTAR AO<br>COMEÇO</span><b>↑</b></a></section>
     </main>
     <footer class="site-footer"><a class="footer-brand" href="#inicio">entrelinhas<span>®</span></a><span>UM LUGAR PARA CRIAR E DEIXAR MARCAS.</span><span>© <span id="current-year">2026</span></span></footer>
   </div>
