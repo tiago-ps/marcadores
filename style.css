@@ -922,17 +922,13 @@ h1 em, h2 em, h3 em { color: var(--coral); font-family: var(--serif); font-weigh
 .print-grid {
   width:100%;
   height:100%;
-  display:grid;
-  grid-template-columns:repeat(var(--print-cols),var(--marker-width));
-  grid-template-rows:repeat(var(--print-rows),var(--marker-height));
-  gap:var(--marker-gap);
-  align-content:start;
-  justify-content:start;
+  display:block;
+  position:relative;
 }
 .print-slot {
   width:var(--marker-width);
   height:var(--marker-height);
-  position:relative;
+  position:absolute;
   overflow:hidden;
   background:#fff;
   box-sizing:border-box;
