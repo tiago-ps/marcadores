@@ -460,8 +460,8 @@ h1 em, h2 em, h3 em { color: var(--coral); font-family: var(--serif); font-weigh
 .product-image-wrap.has-verso .product-side { display:none; width:100%; height:100%; }
 .product-image-wrap.has-verso .product-side.is-active { display:block; }
 .product-side {
-  position: relative; flex: 1 1 100%; min-width: 0; border: 0; padding: 18px 16px 28px;
-  background: #f8f5ec; cursor: zoom-in; overflow: hidden;
+  position:relative; display:block; width:100%; height:100%; flex:none; min-width:0;
+  border:0; padding:18px 16px 28px; background:#f8f5ec; cursor:zoom-in; overflow:hidden;
 }
 .product-side img {
   width: 100%; height: 100%; display: block; object-fit: contain;
