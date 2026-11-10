@@ -77,9 +77,10 @@
 
   function updateState() {
     emptyState.hidden = loadedCount > 0;
-    itemCount.textContent = loadedCount === 1
+    const total = collectionMarkers.length;
+    itemCount.textContent = total === 1
       ? "1 MARCADOR NA COLEÇÃO"
-      : loadedCount + " MARCADORES NA COLEÇÃO";
+      : total + " MARCADORES NA COLEÇÃO";
   }
 
   function openImage(src, title, side) {
