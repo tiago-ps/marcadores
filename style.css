@@ -736,7 +736,8 @@ h1 em, h2 em, h3 em { color: var(--coral); font-family: var(--serif); font-weigh
 .select-marker {
   position:absolute;
   top:10px;
-  right:10px;
+  left:10px;
+  right:auto;
   z-index:4;
   width:32px;
   height:32px;
@@ -885,9 +886,11 @@ h1 em, h2 em, h3 em { color: var(--coral); font-family: var(--serif); font-weigh
   font-size:14px;
 }
 .print-preview {
+  width:100%;
+  min-width:0;
   margin-top:50px;
-  overflow:auto;
-  padding-bottom:12px;
+  overflow:hidden;
+  padding:0 0 12px;
 }
 .print-preview[hidden] { display:none !important; }
 .print-preview-head {
@@ -902,6 +905,8 @@ h1 em, h2 em, h3 em { color: var(--coral); font-family: var(--serif); font-weigh
 }
 .print-preview-head span:last-child { color:var(--ink); }
 #print-sheets {
+  width:100%;
+  min-width:0;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -1019,6 +1024,7 @@ h1 em, h2 em, h3 em { color: var(--coral); font-family: var(--serif); font-weigh
     display:block !important;
   }
   .print-sheet {
+    zoom:1 !important;
     width:var(--sheet-width) !important;
     height:var(--sheet-height) !important;
     margin:0 !important;
