@@ -374,6 +374,7 @@
   function createPrintPage(markers, config, side) {
     const page = document.createElement("div");
     page.className = "print-sheet " + side;
+    page.dataset.pageWidth = String(config.pageW);
     page.style.page = "print-" + config.orientation;
     page.style.setProperty("--sheet-width", config.pageW + "mm");
     page.style.setProperty("--sheet-height", config.pageH + "mm");
@@ -439,6 +440,16 @@
     return page;
   }
 
+  function fitPrintPreview() {
+    if (printPreview.hidden) return;
+    const availableWidth = Math.max(0, printPreview.clientWidth - 24);
+    printSheets.querySelectorAll(".print-sheet").forEach(sheet => {
+      const pageWidth = Number(sheet.dataset.pageWidth) * 96 / 25.4;
+      const scale = pageWidth > 0 ? Math.min(1, availableWidth / pageWidth) : 1;
+      sheet.style.zoom = String(scale);
+    });
+  }
+
   function renderPrintPlanner() {
     const config = getPrintConfig();
     const selected = collectionMarkers.filter(marker => selectedMarkers.has(markerKey(marker)));
@@ -463,6 +474,7 @@
     document.getElementById("print-preview-note").textContent =
       config.capacity + " por folha · A4 " + orientation + duplexText;
     printCapacity.textContent = config.capacity + " marcador(es) por folha · " + pageCount + " folha(s) de A4 para " + selected.length + " selecionado(s).";
+    requestAnimationFrame(fitPrintPreview);
   }
 
   function preparePrint() {
@@ -475,6 +487,7 @@
     }))).then(() => window.print());
   }
 
+  window.addEventListener("resize", fitPrintPreview);
   document.getElementById("print-button").addEventListener("click", preparePrint);
   document.getElementById("print-clear").addEventListener("click", () => {
     selectedMarkers.clear();
@@ -554,7 +567,7 @@
   document.getElementById("current-year").textContent = new Date().getFullYear();
 
   const revealTargets = document.querySelectorAll(
-    ".intro, .collection-heading, .gallery-empty, .manifesto, .closing"
+    ".intro, .collection-heading, .gallery-empty, .closing"
   );
 
   if ("IntersectionObserver" in window) {
