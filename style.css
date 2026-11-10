@@ -984,9 +984,19 @@ h1 em, h2 em, h3 em { color: var(--coral); font-family: var(--serif); font-weigh
     padding:0 !important;
     background:#fff !important;
   }
-  .site-shell,
+  .site-shell {
+    display:block !important;
+  }
+  .site-shell > header,
+  .site-shell > footer,
+  .site-shell main > *:not(#impressao),
   .image-dialog {
     display:none !important;
+  }
+  .site-shell main {
+    display:block !important;
+    margin:0 !important;
+    padding:0 !important;
   }
   .print-section {
     display:block !important;
