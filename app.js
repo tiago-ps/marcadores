@@ -392,16 +392,23 @@
       slot.className = "print-slot";
       const row = Math.floor(index / config.cols);
       const col = index % config.cols;
+      const stepX = config.width + config.gap;
+      const stepY = config.height + config.gap;
+      let left = config.margin + col * stepX;
+      let top = config.margin + row * stepY;
+
+      // O verso é calculado a partir da posição física exata da frente,
+      // e não a partir da última coluna/linha disponível. Assim, sobras
+      // de espaço na folha não deslocam o verso e as margens ficam espelhadas.
       if (side === "verso" && config.duplex === "long") {
-        slot.style.gridColumn = String(config.cols - col);
-        slot.style.gridRow = String(row + 1);
+        left = config.pageW - config.margin - config.width - col * stepX;
       } else if (side === "verso" && config.duplex === "short") {
-        slot.style.gridColumn = String(col + 1);
-        slot.style.gridRow = String(config.rows - row);
-      } else {
-        slot.style.gridColumn = String(col + 1);
-        slot.style.gridRow = String(row + 1);
+        top = config.pageH - config.margin - config.height - row * stepY;
       }
+
+      slot.style.left = left + "mm";
+      slot.style.top = top + "mm";
+
       const src = side === "verso" ? marker.verso : marker.imagem;
       if (src) {
         const img = document.createElement("img");
