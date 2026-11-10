@@ -184,7 +184,7 @@
   }
 
   function normalizeSearch(value) {
-    return String(value || "").normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toLocaleLowerCase("pt-BR").trim();
+    return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR").trim();
   }
 
   function createMarkerCard(marker, index) {
@@ -272,9 +272,9 @@
     const used = new Set();
 
     images.forEach(file => {
-      if (used.has(file.name) || /-verso\\.(jpe?g|png|webp)$/i.test(file.name)) return;
+      if (used.has(file.name) || /-verso\.(jpe?g|png|webp)$/i.test(file.name)) return;
       let front = file;
-      let baseName = file.name.replace(/\\.(jpe?g|png|webp)$/i, "");
+      let baseName = file.name.replace(/\.(jpe?g|png|webp)$/i, "");
       if (/-frente$/i.test(baseName)) {
         const cleanBase = baseName.replace(/-frente$/i, "");
         const plain = [".jpg", ".jpeg", ".png", ".webp"].map(ext => byName.get((cleanBase + ext).toLowerCase())).find(Boolean);
