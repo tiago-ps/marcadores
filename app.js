@@ -4,6 +4,10 @@
   const gallery = document.getElementById("gallery-grid");
   const emptyState = document.getElementById("gallery-empty");
   const itemCount = document.getElementById("item-count");
+  const searchInput = document.getElementById("gallery-search");
+  const searchClear = document.getElementById("gallery-search-clear");
+  const resultsLabel = document.getElementById("gallery-results");
+  const loadMoreButton = document.getElementById("gallery-more");
   const dialog = document.getElementById("image-dialog");
   const dialogImage = document.getElementById("dialog-image");
   const dialogTitle = document.getElementById("dialog-title");
@@ -12,6 +16,8 @@
   const API_URL = "https://api.github.com/repos/tiago-ps/marcadores/contents/imagens?ref=main";
   let loadedCount = 0;
   let collectionMarkers = [];
+  let filteredMarkers = [];
+  const PAGE_SIZE = 12;
   const selectedMarkers = new Set();
 
   const printPreview = document.getElementById("print-preview");
@@ -176,118 +182,123 @@
     wrapper.appendChild(button);
   }
 
+  function normalizeSearch(value) {
+    return String(value || "").normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toLocaleLowerCase("pt-BR").trim();
+  }
+
+  function createMarkerCard(marker, index) {
+    const card = document.createElement("article");
+    card.className = "product-card";
+    const imageWrap = document.createElement("div");
+    imageWrap.className = marker.verso ? "product-image-wrap has-verso" : "product-image-wrap";
+    addSelectionControl(imageWrap, marker);
+    const frontButton = addImage(imageWrap, marker.imagem, marker.titulo, "frente");
+    if (marker.verso) {
+      const backButton = addImage(imageWrap, marker.verso, marker.titulo, "verso");
+      setupMobileFlip(imageWrap, frontButton, backButton);
+    }
+
+    const meta = document.createElement("div");
+    meta.className = "product-meta";
+    const titleLine = document.createElement("div");
+    titleLine.className = "product-title-line";
+    const name = document.createElement("span");
+    name.className = "product-name";
+    name.textContent = marker.titulo;
+    const number = document.createElement("span");
+    number.className = "product-number";
+    number.textContent = "Nº " + String(index + 1).padStart(2, "0");
+    titleLine.append(name, number);
+    meta.appendChild(titleLine);
+
+    if (marker.autoria) {
+      const author = marker.autorUrl ? document.createElement("a") : document.createElement("span");
+      author.className = "product-author";
+      author.textContent = "Por " + marker.autoria;
+      if (marker.autorUrl) {
+        author.href = marker.autorUrl;
+        author.target = "_blank";
+        author.rel = "noopener noreferrer";
+        author.setAttribute("aria-label", "Ver perfil de " + marker.autoria + " no Instagram");
+      }
+      meta.appendChild(author);
+    }
+    card.append(imageWrap, meta);
+    return card;
+  }
+
+  function renderGalleryPage(reset) {
+    if (reset) {
+      gallery.innerHTML = "";
+      loadedCount = 0;
+    }
+    const next = filteredMarkers.slice(loadedCount, loadedCount + PAGE_SIZE);
+    next.forEach(marker => gallery.appendChild(createMarkerCard(marker, collectionMarkers.indexOf(marker))));
+    loadedCount += next.length;
+    loadMoreButton.hidden = loadedCount >= filteredMarkers.length;
+    resultsLabel.textContent = filteredMarkers.length === collectionMarkers.length
+      ? filteredMarkers.length + " marcadores"
+      : filteredMarkers.length + " de " + collectionMarkers.length + " marcadores";
+    if (filteredMarkers.length === 0) {
+      gallery.innerHTML = "";
+      emptyState.hidden = false;
+      emptyState.querySelector(".empty-label").textContent = "NENHUM MARCADOR ENCONTRADO";
+      emptyState.querySelector("h3").innerHTML = "Não encontramos<br><em>esse marcador.</em>";
+      emptyState.querySelector("p").textContent = "Tente outro título ou nome de autor.";
+    } else {
+      emptyState.hidden = true;
+    }
+    updateState();
+  }
+
+  function applyGallerySearch() {
+    const query = normalizeSearch(searchInput ? searchInput.value : "");
+    filteredMarkers = collectionMarkers.filter(marker =>
+      !query || normalizeSearch(marker.titulo + " " + (marker.autoria || "")).includes(query)
+    );
+    if (searchClear) searchClear.hidden = !query;
+    renderGalleryPage(true);
+  }
+
   function renderMarkers(files) {
     const images = files
       .filter(file => file.type === "file" && IMAGE_EXTENSIONS.test(file.name))
-      .sort((a, b) => a.name.localeCompare(b.name, "pt-BR", {
-        numeric: true,
-        sensitivity: "base"
-      }));
-
+      .sort((a, b) => a.name.localeCompare(b.name, "pt-BR", { numeric: true, sensitivity: "base" }));
     const byName = new Map(images.map(file => [file.name.toLowerCase(), file]));
-    const catalogByImage = new Map((Array.isArray(window.MARCADORES) ? window.MARCADORES : []).map(marker => [String(marker.imagem || "").split("/").pop().toLowerCase(), marker]));
+    const catalogByImage = new Map((Array.isArray(window.MARCADORES) ? window.MARCADORES : [])
+      .map(marker => [String(marker.imagem || "").split("/").pop().toLowerCase(), marker]));
     const markers = [];
     const used = new Set();
 
     images.forEach(file => {
-      if (used.has(file.name)) return;
-
-      // Arquivos com "-verso" pertencem à imagem correspondente.
-      if (/-verso\.(jpe?g|png|webp)$/i.test(file.name)) return;
-
+      if (used.has(file.name) || /-verso\\.(jpe?g|png|webp)$/i.test(file.name)) return;
       let front = file;
-      let baseName = file.name.replace(/\.(jpe?g|png|webp)$/i, "");
-
-      // Aceita tanto "nome.jpg" quanto "nome-frente.jpg".
+      let baseName = file.name.replace(/\\.(jpe?g|png|webp)$/i, "");
       if (/-frente$/i.test(baseName)) {
         const cleanBase = baseName.replace(/-frente$/i, "");
-        const plainCandidates = [
-          cleanBase + ".jpg",
-          cleanBase + ".jpeg",
-          cleanBase + ".png",
-          cleanBase + ".webp"
-        ];
-        const plain = plainCandidates
-          .map(name => byName.get(name.toLowerCase()))
-          .find(Boolean);
-
-        if (plain) {
-          front = plain;
-          baseName = cleanBase;
-          used.add(file.name);
-        }
+        const plain = [".jpg", ".jpeg", ".png", ".webp"].map(ext => byName.get((cleanBase + ext).toLowerCase())).find(Boolean);
+        if (plain) { front = plain; baseName = cleanBase; used.add(file.name); }
       }
-
-      const versoCandidates = [
-        baseName + "-verso.jpg",
-        baseName + "-verso.jpeg",
-        baseName + "-verso.png",
-        baseName + "-verso.webp"
-      ];
-
-      const verso = versoCandidates
-        .map(name => byName.get(name.toLowerCase()))
-        .find(Boolean);
-
+      const verso = [".jpg", ".jpeg", ".png", ".webp"]
+        .map(ext => byName.get((baseName + "-verso" + ext).toLowerCase())).find(Boolean);
+      const catalogEntry = catalogByImage.get(front.name.toLowerCase()) || {};
       markers.push({
-        titulo: humanizeTitle((catalogByImage.get(front.name.toLowerCase()) || {}).titulo || formatTitle(front.name)),
+        titulo: humanizeTitle(catalogEntry.titulo || formatTitle(front.name)),
         imagem: front.download_url,
-        verso: verso ? verso.download_url : null
+        verso: verso ? verso.download_url : null,
+        autoria: catalogEntry.autoria || "",
+        autorUrl: catalogEntry.autorUrl || ""
       });
-
       used.add(front.name);
       if (verso) used.add(verso.name);
     });
-
-    // Um arquivo "-verso" sem frente continua visível, para nenhum trabalho desaparecer.
     images.forEach(file => {
       if (used.has(file.name)) return;
-
-      markers.push({
-        titulo: formatTitle(file.name),
-        imagem: file.download_url,
-        verso: null
-      });
+      const catalogEntry = catalogByImage.get(file.name.toLowerCase()) || {};
+      markers.push({ titulo: catalogEntry.titulo || formatTitle(file.name), imagem: file.download_url, verso: null, autoria: catalogEntry.autoria || "", autorUrl: catalogEntry.autorUrl || "" });
     });
-
     collectionMarkers = markers;
-    gallery.innerHTML = "";
-    loadedCount = 0;
-
-    markers.forEach((marker, index) => {
-      const card = document.createElement("article");
-      card.className = "product-card";
-
-      const imageWrap = document.createElement("div");
-      imageWrap.className = marker.verso
-        ? "product-image-wrap has-verso"
-        : "product-image-wrap";
-
-      addSelectionControl(imageWrap, marker);
-      const frontButton = addImage(imageWrap, marker.imagem, marker.titulo, "frente");
-      if (marker.verso) {
-        const backButton = addImage(imageWrap, marker.verso, marker.titulo, "verso");
-        setupMobileFlip(imageWrap, frontButton, backButton);
-      }
-
-      const meta = document.createElement("div");
-      meta.className = "product-meta";
-
-      const name = document.createElement("span");
-      name.className = "product-name";
-      name.textContent = marker.titulo;
-
-      const number = document.createElement("span");
-      number.className = "product-number";
-      number.textContent = "Nº " + String(index + 1).padStart(2, "0");
-
-      meta.append(name, number);
-      card.append(imageWrap, meta);
-      gallery.appendChild(card);
-      loadedCount += 1;
-    });
-
-    updateState();
+    applyGallerySearch();
   }
 
   async function loadCollection() {
@@ -306,44 +317,8 @@
       const fallback = Array.isArray(window.MARCADORES) ? window.MARCADORES : [];
 
       if (fallback.length) {
-        collectionMarkers = fallback;
-        gallery.innerHTML = "";
-        loadedCount = 0;
-
-        fallback.forEach((marker, index) => {
-          const card = document.createElement("article");
-          card.className = "product-card";
-
-          const imageWrap = document.createElement("div");
-          imageWrap.className = marker.verso
-            ? "product-image-wrap has-verso"
-            : "product-image-wrap";
-
-          addSelectionControl(imageWrap, marker);
-          const frontButton = addImage(imageWrap, marker.imagem, marker.titulo, "frente");
-          if (marker.verso) {
-            const backButton = addImage(imageWrap, marker.verso, marker.titulo, "verso");
-            setupMobileFlip(imageWrap, frontButton, backButton);
-          }
-
-          const meta = document.createElement("div");
-          meta.className = "product-meta";
-
-          const name = document.createElement("span");
-          name.className = "product-name";
-          name.textContent = marker.titulo;
-
-          const number = document.createElement("span");
-          number.className = "product-number";
-          number.textContent = "Nº " + String(index + 1).padStart(2, "0");
-
-          meta.append(name, number);
-          card.append(imageWrap, meta);
-          gallery.appendChild(card);
-          loadedCount += 1;
-        });
-
-        updateState();
+        collectionMarkers = fallback.map(marker => ({ ...marker }));
+        applyGallerySearch();
       } else {
         emptyState.hidden = false;
         itemCount.textContent = "NÃO FOI POSSÍVEL CARREGAR A COLEÇÃO";
@@ -498,6 +473,10 @@
     document.getElementById(id).addEventListener("input", renderPrintPlanner);
     document.getElementById(id).addEventListener("change", renderPrintPlanner);
   });
+
+  if (searchInput) searchInput.addEventListener("input", applyGallerySearch);
+  if (searchClear) searchClear.addEventListener("click", () => { searchInput.value = ""; applyGallerySearch(); searchInput.focus(); });
+  if (loadMoreButton) loadMoreButton.addEventListener("click", () => renderGalleryPage(false));
 
   loadCollection();
   updatePrintSelectionUI();
