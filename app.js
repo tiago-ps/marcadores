@@ -385,12 +385,22 @@
 
     const grid = document.createElement("div");
     grid.className = "print-grid";
-    if (side === "verso" && config.duplex === "long") grid.classList.add("mirror-columns");
-    if (side === "verso" && config.duplex === "short") grid.classList.add("mirror-rows");
 
-    markers.forEach(marker => {
+    markers.forEach((marker, index) => {
       const slot = document.createElement("div");
       slot.className = "print-slot";
+      const row = Math.floor(index / config.cols);
+      const col = index % config.cols;
+      if (side === "verso" && config.duplex === "long") {
+        slot.style.gridColumn = String(config.cols - col);
+        slot.style.gridRow = String(row + 1);
+      } else if (side === "verso" && config.duplex === "short") {
+        slot.style.gridColumn = String(col + 1);
+        slot.style.gridRow = String(config.rows - row);
+      } else {
+        slot.style.gridColumn = String(col + 1);
+        slot.style.gridRow = String(row + 1);
+      }
       const src = side === "verso" ? marker.verso : marker.imagem;
       if (src) {
         const img = document.createElement("img");
