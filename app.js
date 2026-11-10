@@ -422,6 +422,12 @@
         img.src = src;
         img.alt = marker.titulo + " — " + side;
         img.draggable = false;
+        // Na virada pela margem curta, a folha fica invertida em relação
+        // ao observador; giramos a arte 180° no plano para que ela fique
+        // na posição correta após a virada. Nunca espelhamos o texto.
+        if (side === "verso" && config.duplex === "short") {
+          img.style.transform = "rotate(180deg)";
+        }
         slot.appendChild(img);
       }
       const cut = document.createElement("span");
