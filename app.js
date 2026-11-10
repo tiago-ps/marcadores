@@ -11,6 +11,13 @@
   const IMAGE_EXTENSIONS = /\.(jpe?g|png|webp)$/i;
   const API_URL = "https://api.github.com/repos/tiago-ps/marcadores/contents/imagens?ref=main";
   let loadedCount = 0;
+  let collectionMarkers = [];
+  const selectedMarkers = new Set();
+
+  const printPreview = document.getElementById("print-preview");
+  const printSheets = document.getElementById("print-sheets");
+  const printSelectionCount = document.getElementById("print-selection-count");
+  const printCapacity = document.getElementById("print-capacity");
 
   const TITLE_REPLACEMENTS = {
     "agua": "água",
@@ -128,6 +135,47 @@
     }, { passive:true });
   }
 
+  function markerKey(marker) {
+    return marker.imagem || marker.titulo;
+  }
+
+  function updatePrintSelectionUI() {
+    const count = selectedMarkers.size;
+    printSelectionCount.textContent = count === 0
+      ? "Nenhum marcador selecionado"
+      : count === 1 ? "1 marcador selecionado" : count + " marcadores selecionados";
+    printCapacity.textContent = count === 0
+      ? "Selecione os marcadores na coleção."
+      : "A folha será organizada automaticamente conforme as medidas escolhidas.";
+    document.getElementById("print-button").disabled = count === 0;
+    document.querySelectorAll(".select-marker").forEach(button => {
+      const selected = selectedMarkers.has(button.dataset.markerKey);
+      button.classList.toggle("is-selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
+      button.textContent = selected ? "✓" : "+";
+      button.setAttribute("aria-label", selected ? "Remover da impressão" : "Selecionar para impressão");
+    });
+  }
+
+  function addSelectionControl(wrapper, marker) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "select-marker";
+    button.dataset.markerKey = markerKey(marker);
+    button.textContent = selectedMarkers.has(markerKey(marker)) ? "✓" : "+";
+    button.setAttribute("aria-pressed", String(selectedMarkers.has(markerKey(marker))));
+    button.setAttribute("aria-label", selectedMarkers.has(markerKey(marker)) ? "Remover da impressão" : "Selecionar para impressão");
+    button.addEventListener("click", event => {
+      event.stopPropagation();
+      const key = markerKey(marker);
+      if (selectedMarkers.has(key)) selectedMarkers.delete(key);
+      else selectedMarkers.add(key);
+      updatePrintSelectionUI();
+      renderPrintPlanner();
+    });
+    wrapper.appendChild(button);
+  }
+
   function renderMarkers(files) {
     const images = files
       .filter(file => file.type === "file" && IMAGE_EXTENSIONS.test(file.name))
@@ -202,6 +250,7 @@
       });
     });
 
+    collectionMarkers = markers;
     gallery.innerHTML = "";
     loadedCount = 0;
 
@@ -214,6 +263,7 @@
         ? "product-image-wrap has-verso"
         : "product-image-wrap";
 
+      addSelectionControl(imageWrap, marker);
       const frontButton = addImage(imageWrap, marker.imagem, marker.titulo, "frente");
       if (marker.verso) {
         const backButton = addImage(imageWrap, marker.verso, marker.titulo, "verso");
@@ -256,6 +306,7 @@
       const fallback = Array.isArray(window.MARCADORES) ? window.MARCADORES : [];
 
       if (fallback.length) {
+        collectionMarkers = fallback;
         gallery.innerHTML = "";
         loadedCount = 0;
 
@@ -268,6 +319,7 @@
             ? "product-image-wrap has-verso"
             : "product-image-wrap";
 
+          addSelectionControl(imageWrap, marker);
           const frontButton = addImage(imageWrap, marker.imagem, marker.titulo, "frente");
           if (marker.verso) {
             const backButton = addImage(imageWrap, marker.verso, marker.titulo, "verso");
@@ -299,7 +351,113 @@
     }
   }
 
+
+  function getPrintConfig() {
+    const orientationChoice = document.getElementById("print-orientation").value;
+    const width = Math.max(20, Number(document.getElementById("print-width").value) || 50);
+    const height = Math.max(60, Number(document.getElementById("print-height").value) || 150);
+    const gap = Math.max(0, Number(document.getElementById("print-gap").value) || 0);
+    const margin = Math.max(5, Number(document.getElementById("print-margin").value) || 10);
+    const duplex = document.getElementById("print-duplex").value;
+    const candidates = orientationChoice === "portrait" ? ["portrait"] : orientationChoice === "landscape" ? ["landscape"] : ["portrait", "landscape"];
+    const layouts = candidates.map(orientation => {
+      const pageW = orientation === "portrait" ? 210 : 297;
+      const pageH = orientation === "portrait" ? 297 : 210;
+      const cols = Math.max(0, Math.floor((pageW - margin * 2 + gap) / (width + gap)));
+      const rows = Math.max(0, Math.floor((pageH - margin * 2 + gap) / (height + gap)));
+      return { orientation, pageW, pageH, cols, rows, capacity: cols * rows };
+    });
+    const layout = layouts.sort((a, b) => b.capacity - a.capacity)[0];
+    return { ...layout, width, height, gap, margin, duplex };
+  }
+
+  function createPrintPage(markers, config, side) {
+    const page = document.createElement("div");
+    page.className = "print-sheet " + side;
+    page.style.setProperty("--sheet-width", config.pageW + "mm");
+    page.style.setProperty("--sheet-height", config.pageH + "mm");
+    page.style.setProperty("--marker-width", config.width + "mm");
+    page.style.setProperty("--marker-height", config.height + "mm");
+    page.style.setProperty("--marker-gap", config.gap + "mm");
+    page.style.setProperty("--sheet-margin", config.margin + "mm");
+    page.style.setProperty("--print-cols", config.cols);
+    page.style.setProperty("--print-rows", config.rows);
+
+    const grid = document.createElement("div");
+    grid.className = "print-grid";
+    if (side === "verso" && config.duplex === "long") grid.classList.add("mirror-columns");
+    if (side === "verso" && config.duplex === "short") grid.classList.add("mirror-rows");
+
+    markers.forEach(marker => {
+      const slot = document.createElement("div");
+      slot.className = "print-slot";
+      const src = side === "verso" ? marker.verso : marker.imagem;
+      if (src) {
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = marker.titulo + " — " + side;
+        img.draggable = false;
+        if (side === "verso") img.classList.add(config.duplex === "long" ? "duplex-mirror-x" : "duplex-mirror-y");
+        slot.appendChild(img);
+      }
+      const cut = document.createElement("span");
+      cut.className = "cut-mark";
+      slot.appendChild(cut);
+      grid.appendChild(slot);
+    });
+    page.appendChild(grid);
+    return page;
+  }
+
+  function renderPrintPlanner() {
+    const config = getPrintConfig();
+    const selected = collectionMarkers.filter(marker => selectedMarkers.has(markerKey(marker)));
+    printSheets.innerHTML = "";
+    if (!selected.length || !config.capacity) {
+      printPreview.hidden = true;
+      if (selected.length && !config.capacity) printCapacity.textContent = "As medidas escolhidas não cabem em uma folha A4 com a margem atual.";
+      return;
+    }
+
+    const hasVerso = selected.some(marker => marker.verso);
+    const pageCount = Math.ceil(selected.length / config.capacity);
+    for (let pageIndex = 0; pageIndex < pageCount; pageIndex += 1) {
+      const batch = selected.slice(pageIndex * config.capacity, (pageIndex + 1) * config.capacity);
+      printSheets.appendChild(createPrintPage(batch, config, "frente"));
+      if (hasVerso) printSheets.appendChild(createPrintPage(batch, config, "verso"));
+    }
+
+    printPreview.hidden = false;
+    const orientation = config.orientation === "portrait" ? "retrato" : "paisagem";
+    const duplexText = hasVerso ? " · frente e verso preparado" : " · somente frente";
+    document.getElementById("print-preview-note").textContent =
+      config.capacity + " por folha · A4 " + orientation + duplexText;
+    printCapacity.textContent = config.capacity + " marcador(es) por folha · " + pageCount + " folha(s) de A4 para " + selected.length + " selecionado(s).";
+  }
+
+  function preparePrint() {
+    renderPrintPlanner();
+    if (!selectedMarkers.size) return;
+    const images = Array.from(printSheets.querySelectorAll("img"));
+    Promise.all(images.map(img => img.complete ? Promise.resolve() : new Promise(resolve => {
+      img.addEventListener("load", resolve, { once: true });
+      img.addEventListener("error", resolve, { once: true });
+    }))).then(() => window.print());
+  }
+
+  document.getElementById("print-button").addEventListener("click", preparePrint);
+  document.getElementById("print-clear").addEventListener("click", () => {
+    selectedMarkers.clear();
+    updatePrintSelectionUI();
+    renderPrintPlanner();
+  });
+  ["print-orientation", "print-width", "print-height", "print-gap", "print-margin", "print-duplex"].forEach(id => {
+    document.getElementById(id).addEventListener("input", renderPrintPlanner);
+    document.getElementById(id).addEventListener("change", renderPrintPlanner);
+  });
+
   loadCollection();
+  updatePrintSelectionUI();
 
   const choiceInputs = document.querySelectorAll('input[name="caminho"]');
   const guidance = document.getElementById("contact-guidance");
