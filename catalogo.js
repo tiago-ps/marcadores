@@ -8,7 +8,7 @@ window.MARCADORES = [
   { titulo: "Aeiou", imagem: "imagens/aeiou.jpg" },
   { titulo: "Agua Viva", imagem: "imagens/agua-viva.jpg" },
   { titulo: "Alegria", imagem: "imagens/alegria.jpg" },
-  { titulo: "All My Loving", imagem: "imagens/all-my-loving.jpg", verso: "imagens/all-my-loving-verso.jpg" },
+  { titulo: "All my Loving", imagem: "imagens/all-my-loving.jpg", verso: "imagens/all-my-loving-verso.jpg", autoria: "Ana Clara", autorUrl: "https://www.instagram.com/docinhosanimados/" },
   { titulo: "Angel", imagem: "imagens/angel.jpg" },
   { titulo: "Angel2", imagem: "imagens/angel2.jpg" },
   { titulo: "Baratinha", imagem: "imagens/baratinha.jpg" },
