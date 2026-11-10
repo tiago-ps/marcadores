@@ -941,8 +941,6 @@ h1 em, h2 em, h3 em { color: var(--coral); font-family: var(--serif); font-weigh
   print-color-adjust:exact;
   -webkit-print-color-adjust:exact;
 }
-.print-slot .duplex-mirror-x { transform:scaleX(-1); }
-.print-slot .duplex-mirror-y { transform:scaleY(-1); }
 .cut-mark {
   position:absolute;
   inset:0;
